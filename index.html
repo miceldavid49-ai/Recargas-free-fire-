@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JNR AMPA - Recargas Free Fire</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #08080a;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      position: relative;
+    }
+
+    /* FONDO DE PARTÍCULAS ANIMADAS */
+    .bg-animation {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: -1;
+      background: radial-gradient(circle at 50% 30%, #2b0b00 0%, #08080a 70%);
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 69, 0, 0.6);
+      box-shadow: 0 0 10px #ff4500, 0 0 20px #ff2200;
+      animation: floatUp linear infinite;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0.3); opacity: 0; }
+      50% { opacity: 0.8; }
+      100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(22, 22, 28, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 24px 20px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 69, 0, 0.4);
+      box-shadow: 0 0 25px rgba(255, 69, 0, 0.25);
+    }
+
+    h1 {
+      text-align: center;
+      color: #ff5500;
+      margin-bottom: 4px;
+      text-shadow: 0 0 12px #ff2200;
+      font-size: 26px;
+      text-transform: uppercase;
+    }
+    h3 {
+      text-align: center;
+      color: #aaa;
+      font-size: 13px;
+      margin-bottom: 25px;
+      text-transform: uppercase;
+    }
+
+    .section-title {
+      font-weight: bold;
+      color: #ff5500;
+      margin: 15px 0 12px 0;
+      font-size: 14px;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255, 85, 0, 0.3);
+      padding-bottom: 6px;
+    }
+
+    /* BLOQUES DE FASES */
+    .step-box {
+      background: #111116;
+      border: 1px solid #ff4500;
+      padding: 18px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: inset 0 0 10px rgba(255, 69, 0, 0.15);
+      transition: all 0.5s ease-in-out;
+    }
+
+    .hidden-step {
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    .visible-step {
+      display: block;
+      animation: fadeInUp 0.5s forwards;
+    }
+
+    @keyframes fadeInUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* INPUTS Y BOTONES */
+    .input-row { display: flex; gap: 8px; }
+    input[type="text"], input[type="tel"], input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #1c1c24;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      margin-top: 6px;
+    }
+    input[type="text"]:focus, input[type="tel"]:focus {
+      border-color: #ff5500;
+      box-shadow: 0 0 8px rgba(255, 85, 0, 0.4);
+    }
+
+    .btn-search, .btn-submit {
+      background: linear-gradient(135deg, #ff5500, #ff2200);
+      border: none;
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.2s;
+      width: 100%;
+    }
+    .btn-search { width: auto; }
+    .btn-search:hover, .btn-submit:hover { filter: brightness(1.2); }
+
+    /* CARGADORES Y RESULTADO */
+    .search-loader {
+      display: none;
+      text-align: center;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #ffaa00;
+    }
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 3px solid rgba(255,170,0,0.3);
+      border-radius: 50%;
+      border-top-color: #ffaa00;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* TARJETA DEL NICKNAME ENCONTRADO */
+    .user-card {
+      background: rgba(0, 255, 127, 0.08);
+      border: 1px solid #00ff7f;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+    .user-card .verified { color: #00ff7f; font-weight: bold; margin-bottom: 4px; }
+
+    /* GRILLA DE CATÁLOGO */
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .card {
+      background: #1c1c24;
+      border: 2px solid #2d2d3a;
+      padding: 14px 10px;
+      text-align: center;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .card:hover { border-color: #ff5500; transform: translateY(-2px); }
+    .card.selected {
+      border-color: #ff5500;
+      background: rgba(
