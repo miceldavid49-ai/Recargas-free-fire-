@@ -186,5 +186,253 @@
     .card:hover { border-color: #ff5500; transform: translateY(-2px); }
     .card.selected {
       border-color: #ff5500;
-      background: rgba(
-<script src="Freefire.js"></script>
+      background: rgba(255, 85, 0, 0.2);
+      box-shadow: 0 0 12px rgba(255, 85, 0, 0.4);
+    }
+    .diamonds { font-weight: bold; font-size: 15px; color: #fff; }
+    .price { font-size: 13px; color: #ffaa00; margin-top: 4px; }
+
+    /* DATOS BANCARIOS PAGO MÓVIL */
+    .pago-movil-box {
+      background: rgba(255, 255, 255, 0.04);
+      border-left: 3px solid #ff5500;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .error-msg { color: #ff4444; font-size: 12px; margin-top: 8px; display: none; }
+    label { font-size: 12px; color: #ccc; margin-top: 10px; display: block; }
+  </style>
+</head>
+<body>
+
+  <div class="bg-animation" id="bg-particles"></div>
+
+  <div class="container">
+    <h1>RECARGAS JNR AMPA</h1>
+    <h3>Centro Oficial de Recargas Free Fire</h3>
+
+    <div class="step-box" id="step-1">
+      <div class="section-title" style="margin-top:0;">1. Ingresa tu ID de Jugador</div>
+      <div class="input-row">
+        <input type="text" id="player-id-input" placeholder="Ej: 123456789" maxlength="12">
+        <button class="btn-search" onclick="buscarJugador()">Buscar</button>
+      </div>
+
+      <div class="search-loader" id="search-loader">
+        <span class="spinner"></span> Consultando con PagoStore...
+      </div>
+      <div class="error-msg" id="error-msg"></div>
+
+      <div class="user-card" id="user-card" style="display:none;">
+        <div class="verified">✓ JUGADOR ENCONTRADO EN PAGOSTORE</div>
+        <div><strong>Nombre del Jugador:</strong> <span id="player-name-display" style="color: #00ff7f; font-size:15px;"></span></div>
+        <div><strong>ID Registrado:</strong> <span id="player-id-display"></span></div>
+      </div>
+    </div>
+
+    <div class="step-box hidden-step" id="step-2">
+      <div class="section-title" style="margin-top:0;">2. Selecciona tu Paquete</div>
+      <div class="grid">
+        <div class="card" onclick="seleccionarPaquete('110 Diamantes', '900 Bs', this)">
+          <div class="diamonds">💎 110</div>
+          <div class="price">900 Bs</div>
+        </div>
+        <div class="card" onclick="seleccionarPaquete('220 Diamantes', '1800 Bs', this)">
+          <div class="diamonds">💎 220</div>
+          <div class="price">1800 Bs</div>
+        </div>
+        <div class="card" onclick="seleccionarPaquete('341 Diamantes', '2600 Bs', this)">
+          <div class="diamonds">💎 341</div>
+          <div class="price">2600 Bs</div>
+        </div>
+        <div class="card" onclick="seleccionarPaquete('572 Diamantes', '4000 Bs', this)">
+          <div class="diamonds">💎 572</div>
+          <div class="price">4000 Bs</div>
+        </div>
+        <div class="card" onclick="seleccionarPaquete('1166 Diamantes', '8100 Bs', this)">
+          <div class="diamonds">💎 1166</div>
+          <div class="price">8100 Bs</div>
+        </div>
+        <div class="card" onclick="seleccionarPaquete('2398 Diamantes', '14950 Bs', this)">
+          <div class="diamonds">💎 2398</div>
+          <div class="price">14950 Bs</div>
+        </div>
+        <div class="card" onclick="seleccionarPaquete('6160 Diamantes', '35800 Bs', this)">
+          <div class="diamonds">💎 6160</div>
+          <div class="price">35800 Bs</div>
+        </div>
+        <div class="card" onclick="seleccionarPaquete('13440 Diamantes', '80000 Bs', this)">
+          <div class="diamonds">💎 13440</div>
+          <div class="price">80000 Bs</div>
+        </div>
+        <div class="card" onclick="seleccionarPaquete('Pase Booyah', '3700 Bs', this)">
+          <div class="diamonds">🎟️ Pase Booyah</div>
+          <div class="price">3700 Bs</div>
+        </div>
+        <div class="card" onclick="seleccionarPaquete('Tarjeta Semanal Básica', '800 Bs', this)">
+          <div class="diamonds">💳 Semanal Básica</div>
+          <div class="price">800 Bs</div>
+        </div>
+        <div class="card" onclick="seleccionarPaquete('Tarjeta Semanal', '2700 Bs', this)">
+          <div class="diamonds">💳 Semanal</div>
+          <div class="price">2700 Bs</div>
+        </div>
+        <div class="card" onclick="seleccionarPaquete('Tarjeta Mensual', '13000 Bs', this)">
+          <div class="diamonds">📅 Mensual</div>
+          <div class="price">13000 Bs</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-box hidden-step" id="step-3">
+      <div class="section-title" style="margin-top:0;">3. Datos para realizar Pago Móvil</div>
+      <div class="pago-movil-box">
+        🏦 <strong>Banco:</strong> (0105) BANCO MERCANTIL<br>
+        📱 <strong>Teléfono:</strong> 04120777444<br>
+        🪪 <strong>Cédula:</strong> V-33.682.901
+      </div>
+    </div>
+
+    <div class="step-box hidden-step" id="step-4">
+      <div class="section-title" style="margin-top:0;">4. Confirmar y Enviar Pedido</div>
+      
+      <label>Tu Número de Teléfono de Contacto:</label>
+      <input type="tel" id="user-phone" placeholder="Ej: 04121234567">
+
+      <label>Últimos 4 o 6 dígitos de Referencia:</label>
+      <input type="text" id="ref-number" placeholder="Ej: 584920" maxlength="8">
+
+      <label>Adjuntar Capture del Pago Móvil:</label>
+      <input type="file" id="receipt-file" accept="image/*">
+
+      <br><br>
+      <button class="btn-submit" onclick="enviarPedido()">ENVIAR PEDIDO A WHATSAPP</button>
+    </div>
+
+  </div>
+
+  <script>
+    // PARTÍCULAS DE FONDO
+    const bg = document.getElementById('bg-particles');
+    for(let i=0; i<25; i++) {
+      let p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.width = p.style.height = (Math.random() * 6 + 2) + 'px';
+      p.style.animationDuration = (Math.random() * 4 + 4) + 's';
+      p.style.animationDelay = Math.random() * 5 + 's';
+      bg.appendChild(p);
+    }
+
+    let datosPedido = { id: '', nickname: '', paquete: '', precio: '' };
+
+    // FUNCIÓN DE BÚSQUEDA DEL JUGADOR
+    async function buscarJugador() {
+      const inputId = document.getElementById('player-id-input').value.trim();
+      const loader = document.getElementById('search-loader');
+      const errorDiv = document.getElementById('error-msg');
+      const userCard = document.getElementById('user-card');
+
+      errorDiv.style.display = 'none';
+      userCard.style.display = 'none';
+
+      if (!inputId || inputId.length < 5) {
+        errorDiv.innerText = "Ingresa un ID de jugador válido.";
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      loader.style.display = 'block';
+
+      try {
+        const response = await fetch(`/api/get-player?id=${inputId}`);
+        const data = await response.json();
+
+        loader.style.display = 'none';
+
+        if (data.success && data.nickname) {
+          datosPedido.id = inputId;
+          datosPedido.nickname = data.nickname;
+
+          // Muestra el nombre en el cuadro verde de verificación
+          document.getElementById('player-name-display').innerText = data.nickname;
+          document.getElementById('player-id-display').innerText = inputId;
+          userCard.style.display = 'block';
+
+          // DESBLOQUEA Y HACE SCROLL SUAVE AL CATÁLOGO
+          const step2 = document.getElementById('step-2');
+          step2.classList.remove('hidden-step');
+          step2.classList.add('visible-step');
+          setTimeout(() => step2.scrollIntoView({ behavior: 'smooth' }), 300);
+
+        } else {
+          errorDiv.innerText = data.error || "No se encontró el jugador con ese ID.";
+          errorDiv.style.display = 'block';
+        }
+      } catch (err) {
+        loader.style.display = 'none';
+        errorDiv.innerText = "Error de conexión con el servidor. Reintenta.";
+        errorDiv.style.display = 'block';
+      }
+    }
+
+    // SELECCIÓN DE PRODUCTOS
+    function seleccionarPaquete(nombre, precio, elemento) {
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+      elemento.classList.add('selected');
+
+      datosPedido.paquete = nombre;
+      datosPedido.precio = precio;
+
+      // DESBLOQUEA Y HACE SCROLL SUAVE AL PAGO MÓVIL Y COMPROBANTE
+      const step3 = document.getElementById('step-3');
+      const step4 = document.getElementById('step-4');
+
+      step3.classList.remove('hidden-step');
+      step3.classList.add('visible-step');
+
+      step4.classList.remove('hidden-step');
+      step4.classList.add('visible-step');
+
+      setTimeout(() => step3.scrollIntoView({ behavior: 'smooth' }), 300);
+    }
+
+    // ENVÍO DE ORDEN COMPLETA A WHATSAPP
+    function enviarPedido() {
+      const telefono = document.getElementById('user-phone').value.trim();
+      const referencia = document.getElementById('ref-number').value.trim();
+      const comprobante = document.getElementById('receipt-file').files[0];
+
+      if (!telefono) { alert("Ingresa tu número de teléfono de contacto."); return; }
+      if (!referencia) { alert("Ingresa los dígitos de la referencia."); return; }
+
+      // Registro de hora y fecha del pedido
+      const ahora = new Date();
+      const horaPedido = ahora.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: true });
+      const fechaPedido = ahora.toLocaleDateString('es-VE');
+
+      const miWhatsApp = "584120777444"; // Número de atención
+
+      let mensaje = `🚨 *NUEVA RECARGA SOLICITADA* 🚨%0A%0A` +
+                    `⏰ *Fecha/Hora:* ${fechaPedido} - ${horaPedido}%0A` +
+                    `👤 *Jugador:* ${datosPedido.nickname}%0A` +
+                    `🆔 *ID:* ${datosPedido.id}%0A` +
+                    `💎 *Paquete:* ${datosPedido.paquete}%0A` +
+                    `💵 *Precio:* ${datosPedido.precio}%0A%0A` +
+                    `🔢 *N° Referencia:* ${referencia}%0A` +
+                    `📱 *Teléfono Cliente:* ${telefono}%0A%0A` +
+                    `📌 _Adjuntando imagen del capture de Pago Móvil..._`;
+
+      if (comprobante) {
+        alert("¡Pedido generado! Al abrirse WhatsApp, recuerda adjuntar el comprobante desde la galería.");
+      }
+
+      window.open(`https://wa.me/${miWhatsApp}?text=${mensaje}`, '_blank');
+    }
+  </script>
+</body>
+  </html>
+  <script src="freefire.js"></script>
